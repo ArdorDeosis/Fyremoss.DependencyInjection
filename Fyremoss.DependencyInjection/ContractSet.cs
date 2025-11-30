@@ -1,5 +1,4 @@
-﻿using System.Collections.Frozen;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace Fyremoss.DependencyInjection;
 
@@ -8,9 +7,9 @@ namespace Fyremoss.DependencyInjection;
 /// </summary>
 internal class ContractSet
 {
-  private readonly FrozenDictionary<Type, IContract[]> contracts;
+  private readonly Dictionary<Type, IContract[]> contracts;
 
-  internal ContractSet(FrozenDictionary<Type, IContract[]> contracts)
+  internal ContractSet(Dictionary<Type, IContract[]> contracts)
   {
     this.contracts = contracts;
   }
@@ -20,7 +19,7 @@ internal class ContractSet
   /// </summary>
   /// <param name="type">The type whose contracts are to be retrieved.</param>
   /// <returns>A list of contracts associated with the specified type.</returns>
-  public IReadOnlyList<IContract> Get(Type type) => contracts.GetValueOrDefault(type, []);
+  public IReadOnlyList<IContract> Get(Type type) => contracts.TryGetValue(type, out var value) ? value : [];
 
   /// <summary>
   /// Tries to get the first contract associated with the specified type.
@@ -33,7 +32,8 @@ internal class ContractSet
   /// <returns><c>true</c> if a contract is found; otherwise, <c>false</c>.</returns>
   public bool TryGetFirst(Type type, [NotNullWhen(true)] out IContract? contract)
   {
-    contract = contracts.GetValueOrDefault(type, []).FirstOrDefault();
-    return contract is not null;
+    contract = default!;
+    return contracts.TryGetValue(type, out var value) && 
+      (contract = value.FirstOrDefault()) is not null;
   }
 }

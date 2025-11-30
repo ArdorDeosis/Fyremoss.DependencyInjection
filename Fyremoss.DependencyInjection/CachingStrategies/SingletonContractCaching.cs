@@ -6,27 +6,19 @@
 /// <inheritdoc cref="IContractCachingStrategy{T}" />
 internal class SingletonContractCaching<T> : IContractCachingStrategy<T>, IDisposable where T : notnull
 {
-  private readonly Lock lockObject = new();
+  private readonly object resolutionLock = new();
   private volatile bool hasResolved;
   private T instance = default!;
 
   /// <inheritdoc />
   public T Resolve(IInjector injector, IInstanceSource<T> instanceSource)
   {
-    if (!hasResolved)
+    lock (resolutionLock)
     {
-      lockObject.Enter();
-      try
+      if (!hasResolved)
       {
-        if (!hasResolved)
-        {
-          instance = instanceSource.Resolve(injector);
-          hasResolved = true;
-        }
-      }
-      finally
-      {
-        lockObject.Exit();
+        instance = instanceSource.Resolve(injector);
+        hasResolved = true;
       }
     }
 
