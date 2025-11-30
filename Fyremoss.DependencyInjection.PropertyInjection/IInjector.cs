@@ -22,8 +22,10 @@ public static class InjectorExtensions
   /// </exception>
   public static void InjectProperties(this IInjector injector, object instance)
   {
-    ArgumentNullException.ThrowIfNull(injector, nameof(injector));
-    ArgumentNullException.ThrowIfNull(instance, nameof(instance));
+    if(injector is null)
+      throw new ArgumentNullException(nameof(injector));
+    if(instance is null)
+      throw new ArgumentNullException(nameof(instance));
 
     var properties = instance.GetType()
       .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);

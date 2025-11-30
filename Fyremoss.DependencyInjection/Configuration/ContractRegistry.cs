@@ -1,6 +1,4 @@
-﻿using System.Collections.Frozen;
-
-namespace Fyremoss.DependencyInjection;
+﻿namespace Fyremoss.DependencyInjection;
 
 /// <summary>
 /// Manages the registration of contracts for dependency injection.
@@ -28,7 +26,7 @@ internal class ContractRegistry
   /// </summary>
   /// <param name="injector">The injector used by the created contracts.</param>
   public ContractSet MakeContractSet(IInjector injector) =>
-    new(contracts.ToFrozenDictionary(
+    new(contracts.ToDictionary(
       entry => entry.Key,
       entry => entry.Value
         .Select(contractConfiguration => ((dynamic)contractConfiguration).BuildContract(injector))

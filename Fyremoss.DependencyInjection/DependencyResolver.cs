@@ -1,5 +1,4 @@
-﻿using System.Collections.Frozen;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace Fyremoss.DependencyInjection;
 
@@ -11,12 +10,12 @@ internal class DependencyResolver
   /// <summary>
   /// A set of collection types that are recognized and can be resolved if their item type has contracts.
   /// </summary>
-  private static readonly FrozenSet<Type> SupportedCollectionTypes = new HashSet<Type>
-  {
+  private static readonly HashSet<Type> SupportedCollectionTypes =
+  [
     typeof(IEnumerable<>),
     typeof(IReadOnlyCollection<>),
     typeof(IReadOnlyList<>),
-  }.ToFrozenSet();
+  ];
 
   private readonly ContractSet contracts;
 

@@ -7,10 +7,10 @@ internal class Injector : IInjector
 {
   private readonly DependencyResolver resolver;
   private readonly CachedConstructorSelector constructorSelector;
-  private readonly IReadOnlySet<CreationHook> creationHooks;
+  private readonly HashSet<CreationHook> creationHooks;
 
   internal Injector(ContractRegistry registry, ConstructorSelector constructorSelector, 
-    IReadOnlySet<CreationHook> creationHooks)
+    HashSet<CreationHook> creationHooks)
   {
     this.creationHooks = creationHooks;
     this.constructorSelector = new CachedConstructorSelector(constructorSelector);
@@ -42,7 +42,8 @@ internal class Injector : IInjector
   /// <inheritdoc />
   public T ExecuteMethod<T>(Delegate factoryMethod)
   {
-    ArgumentNullException.ThrowIfNull(factoryMethod);
+    if (factoryMethod is null)
+      throw new ArgumentNullException(nameof(factoryMethod));
     if (factoryMethod.Method.ReturnType != typeof(T))
       throw new ArgumentException($"Delegate has wrong return type. Expected return type {typeof(T).FullName}.");
 
@@ -64,11 +65,12 @@ internal class Injector : IInjector
   /// <inheritdoc />
   public object Resolve(Type type)
   {
-    ArgumentNullException.ThrowIfNull(type);
+    if(type is null)
+      throw new ArgumentNullException(nameof(type));
     try
     {
       var instance = resolver.Resolve(type);
-      if (instance.GetType().IsAssignableTo(type))
+      if (type.IsInstanceOfType(instance))
         return instance;
       throw new DependencyResolutionException(
         $"Resolved instance is not assignable to resolved type {type.FullName}");
